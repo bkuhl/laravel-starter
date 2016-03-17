@@ -1,0 +1,38 @@
+language: php
+services: docker
+php:
+- 7.0
+env:
+  DOCKER_COMPOSE_VERSION: 1.6.2
+  APP_ENV: local
+  APP_DEBUG: true
+  APP_KEY: SomeRandomString
+  DB_CONNECTION: pgsql
+  DB_HOST: postgres
+  DB_PORT: 5432
+  DB_DATABASE: service_db
+  DB_USERNAME: service_user
+  DB_PASSWORD: P@ssw0rd
+  CACHE_DRIVER: array
+  QUEUE_DRIVER: sync
+before_install:
+- docker -v
+- sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install docker-engine
+- docker -v
+- sudo rm /usr/local/bin/docker-compose
+- curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m`" > docker-compose
+- chmod +x docker-compose
+- sudo mv docker-compose /usr/local/bin
+- cp .env.example .env
+- sudo /etc/init.d/postgresql stop
+install:
+- composer install --no-interaction --prefer-dist
+script:
+- docker-compose -v
+- docker-compose up -d
+- sleep 10
+- docker-compose ps
+- docker exec -it $(docker ps -f name=fpm -q) php artisan migrate --seed
+- docker exec -it $(docker ps -f name=fpm -q) vendor/bin/phpunit
+after_script:
+- docker images
