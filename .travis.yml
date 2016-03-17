@@ -34,8 +34,8 @@ script:
 - docker-compose up -d
 - sleep 10
 - docker-compose ps
-- docker exec -it $(docker ps -f name=fpm -q) php artisan migrate --seed
-- docker exec -it $(docker ps -f name=fpm -q) vendor/bin/phpunit
+- docker exec -it $(docker-compose ps -q fpm) php artisan migrate --seed
+- docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpunit
 after_script:
 - docker images
 notifications:
