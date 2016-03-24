@@ -14,7 +14,7 @@
         "phpunit/phpunit": "~4.0",
         "symfony/css-selector": "2.8.*|3.0.*",
         "symfony/dom-crawler": "2.8.*|3.0.*",
-        "realpage/builder": "dev-master"
+        "realpage/builder": "~0.1"
     },
     "autoload": {
         "classmap": [
@@ -47,6 +47,5 @@
     },
     "config": {
         "preferred-install": "dist"
-    },
-    "minimum-stability": "dev"
+    }
 }
