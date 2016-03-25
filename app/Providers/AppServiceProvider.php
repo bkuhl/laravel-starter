@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use RealPage\Builder\BuilderServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         if (config('app.debug')) {
-            $this->app->register(BuilderServiceProvider::class);
+            $this->app->register(\RealPage\Builder\BuilderServiceProvider::class);
         }
     }
 }
