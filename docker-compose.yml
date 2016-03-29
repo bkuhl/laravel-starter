@@ -27,7 +27,7 @@ services:
     image: realpage/builder:composer-1-beta1
     volumes_from:
       - fpm
-  composer:
+  npm:
     image: realpage/builder:npm-3
     volumes_from:
       - fpm
