@@ -36,7 +36,7 @@ class CleanTemplate extends Command
             $migrations = 'yes';
             $seeds = 'yes';
             $test = 'yes';
-            $name = 'yes';
+            $name = 'App';
         } else {
             $db_reset = $this->confirm('Reset database migrations?', true);
             $migrations = $this->confirm('Remove example database migration?',
