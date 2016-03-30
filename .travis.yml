@@ -16,26 +16,33 @@ env:
   CACHE_DRIVER: array
   QUEUE_DRIVER: sync
 before_install:
-- docker -v
-- sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-  install docker-engine
-- docker -v
-- sudo rm /usr/local/bin/docker-compose
-- curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname
-  -s`-`uname -m`" > docker-compose
-- chmod +x docker-compose
-- sudo mv docker-compose /usr/local/bin
-- cp .env.example .env
-- sudo /etc/init.d/postgresql stop
+  - export DOCKER_REPO="${TRAVIS_REPO_SLUG,,}"
+  - export IMAGE_SLUG="$TRAVIS_BRANCH.${TRAVIS_COMMIT::8}.${TRAVIS_BUILD_ID}"
+  # Upgrade docker/docker-compose versions so we can use v2 of the Dockerfile format
+  - docker -v
+  - sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install docker-engine
+  - docker -v
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m`" > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+  - cp .env.example .env
+  - sudo /etc/init.d/postgresql stop
+  # set env vars in the build settings to interact with repositories
+  # see https://docs.travis-ci.com/user/environment-variables/#Defining-Variables-in-Repository-Settings
+  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 install:
-- composer install --no-interaction --prefer-dist
+  - composer install --no-interaction --prefer-dist
 script:
-- docker-compose -v
-- docker-compose up -d
-- sleep 10
-- docker-compose ps
-- docker exec -it $(docker-compose ps -q fpm) php artisan migrate --seed
-- docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpunit
+  - docker-compose -v
+  - docker-compose up -d
+  - sleep 4
+  - docker-compose ps
+  - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpunit
+  - docker exec -it $(docker-compose ps -q fpm) php artisan migrate --seed
+after_success:
+  # Deployable image tags must be in format: [service].[branch].[commit-hash].[timestamp]
+  - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' ]]; then docker tag "${DOCKER_REPO}:fpm" "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" ; fi
 after_script:
 - docker images
 notifications:
