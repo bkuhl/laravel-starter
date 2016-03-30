@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use PhpParser\Node\Scalar\MagicConst\File;
 use Symfony\Component\Process\Process;
 
 class CleanTemplate extends Command
@@ -32,15 +31,17 @@ class CleanTemplate extends Command
     public function handle()
     {
         if ($this->option('force')) {
-            $db_reset = 'yes';
-            $migrations = 'yes';
-            $seeds = 'yes';
-            $test = 'yes';
+            $db_reset = true;
+            $migrations = true;
+            $seeds = true;
+            $test = true;
             $name = 'App';
         } else {
             $db_reset = $this->confirm('Reset database migrations?', true);
-            $migrations = $this->confirm('Remove example database migration?',
-                true);
+            $migrations = $this->confirm(
+                'Remove example database migration?',
+                true
+            );
             $seeds = $this->confirm('Remove example database seed?', true);
             $test = $this->confirm('Remove example test?', true);
             $name = $this->ask('Application namespace?', 'App');
@@ -54,11 +55,19 @@ class CleanTemplate extends Command
 
         if ($migrations) {
             $migration_filename = database_path('migrations/2014_10_12_000000_create_users_table.php');
-            if ($this->deleteFile($migration_filename, 'Example user migration')) {
+            if ($this->deleteFile(
+                $migration_filename,
+                'Example user migration'
+            )
+            ) {
                 $this->info('Removing example user database migration...');
             }
             $migration_filename = database_path('migrations/2014_10_12_100000_create_password_resets_table.php');
-            if ($this->deleteFile($migration_filename, 'Example password reset migration')) {
+            if ($this->deleteFile(
+                $migration_filename,
+                'Example password reset migration'
+            )
+            ) {
                 $this->info('Removing example password reset database migration...');
             }
         }
@@ -99,11 +108,14 @@ class CleanTemplate extends Command
         $this->removeTravisNotification();
 
         $this->info('Removing this command...');
-        $this->removeLineContaining(base_path('app/Console/kernel.php'), 'CleanTemplate');
+        $this->removeLineContaining(
+            base_path('app/Console/kernel.php'),
+            'CleanTemplate'
+        );
         $this->deleteFile(base_path('app/Console/Commands/CleanTemplate.php'));
     }
 
-    private function deleteFile($filename, $type=null)
+    private function deleteFile($filename, $type = null)
     {
         $system = new Filesystem();
         if ($system->exists($filename)) {
