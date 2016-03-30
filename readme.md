@@ -45,5 +45,5 @@ the application's `.env` configuration is pre-configured to work with the Docker
 8. Boot the application container "stack" using Docker Compose
   * `docker-compose up -d`
   * If you'd like to see the log output you can attach to consolidated logs with `docker-compose logs` (`ctrl + c` to exit)
-9. `php artisan clean:template` to strip out example migrations, seeds, tests, etc...
+9. `php artisan clean:template` to strip out example database seeds, tests, etc...
 10. `docker-compose stop` to stop the application

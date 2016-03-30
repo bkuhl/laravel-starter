@@ -32,16 +32,11 @@ class CleanTemplate extends Command
     {
         if ($this->option('force')) {
             $dbReset = true;
-            $migrations = true;
             $seeds = true;
             $test = true;
             $name = 'App';
         } else {
             $dbReset = $this->confirm('Reset database migrations?', true);
-            $migrations = $this->confirm(
-                'Remove example database migration?',
-                true
-            );
             $seeds = $this->confirm('Remove example database seed?', true);
             $test = $this->confirm('Remove example test?', true);
             $name = $this->ask('Application namespace?', 'App');
@@ -51,25 +46,6 @@ class CleanTemplate extends Command
             $this->info('Resetting database migrations...');
             $dbResetProcess = new Process('docker-compose run --rm fpm php artisan migrate:reset');
             $dbResetProcess->run();
-        }
-
-        if ($migrations) {
-            $migrationFilename = database_path('migrations/2014_10_12_000000_create_users_table.php');
-            if ($this->deleteFile(
-                $migrationFilename,
-                'Example user migration'
-            )
-            ) {
-                $this->info('Removing example user database migration...');
-            }
-            $migrationFilename = database_path('migrations/2014_10_12_100000_create_password_resets_table.php');
-            if ($this->deleteFile(
-                $migrationFilename,
-                'Example password reset migration'
-            )
-            ) {
-                $this->info('Removing example password reset database migration...');
-            }
         }
 
         if ($seeds) {
