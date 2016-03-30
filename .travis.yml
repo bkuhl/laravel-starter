@@ -32,6 +32,9 @@ before_install:
   # see https://docs.travis-ci.com/user/environment-variables/#Defining-Variables-in-Repository-Settings
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 script:
+  # Ensure breaking PSR2 compliance fails in CI
+  - php ./vendor/bin/phpcs --config-set ignore_warnings_on_exit 1
+  - php ./vendor/bin/phpcs --standard=PSR2 --ignore=app/Http/routes.php app
   - docker-compose -v
   - docker-compose up -d
   - sleep 4
