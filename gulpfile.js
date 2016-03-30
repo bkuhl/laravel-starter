@@ -1,3 +1,4 @@
+// Disable gulp notifications in CI
 var gutil = require('gulp-util');
 if (gutil.env.CI) {
     process.env.DISABLE_NOTIFIER = true;
