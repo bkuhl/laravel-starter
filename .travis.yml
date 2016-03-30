@@ -38,11 +38,13 @@ script:
   - docker-compose ps
   # Install php dependencies
   - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:composer-1-beta1) composer install --no-interaction --prefer-dist
-  - docker exec -it $(docker-compose ps -q fpm) ls vendor
   # Seed database
   - docker exec -it $(docker-compose ps -q fpm) php artisan migrate --seed
   # Run tests
   - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpunit
+  # Install npm dependencies & run gulp
+  - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:npm-3) npm rebuild node-sass && npm install --silent
+  - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:npm-3) npm install --global gulp && gulp
 after_success:
   # Deployable image tags must be in format: [service].[branch].[commit-hash].[timestamp]
   - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' ]]; then docker tag "${DOCKER_REPO}:fpm" "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" ; fi
