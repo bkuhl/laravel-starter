@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: infrastructure/fpm/Dockerfile
-    image: realpage/lumen:fpm
+    image: realpage/laravel:fpm
     env_file: .env
     volumes:
       - ./:/var/www/html
@@ -23,11 +23,11 @@ services:
       POSTGRES_USER: service_user
       POSTGRES_PASSWORD: P@ssw0rd
       POSTGRES_DB: service_db
-  npm:
-    image: realpage/builder:npm-3.7
+  composer:
+    image: realpage/builder:composer-1-beta1
     volumes_from:
       - fpm
-  composer:
-    image: realpage/builder:composer-1.0-beta1
+  npm:
+    image: realpage/builder:npm-3
     volumes_from:
       - fpm
