@@ -31,15 +31,17 @@ before_install:
   # set env vars in the build settings to interact with repositories
   # see https://docs.travis-ci.com/user/environment-variables/#Defining-Variables-in-Repository-Settings
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-install:
-  - composer install --no-interaction --prefer-dist
 script:
   - docker-compose -v
   - docker-compose up -d
   - sleep 4
-  - docker-compose ps
-  - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpunit
+  # Install php dependencies
+  - docker exec -it $(docker-compose ps -q composer) composer install --no-interaction --prefer-dist
+  - docker exec -it $(docker-compose ps -q composer) ls /var/www/html/vendor
+  # Seed database
   - docker exec -it $(docker-compose ps -q fpm) php artisan migrate --seed
+  # Run tests
+  - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpunit
 after_success:
   # Deployable image tags must be in format: [service].[branch].[commit-hash].[timestamp]
   - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' ]]; then docker tag "${DOCKER_REPO}:fpm" "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" ; fi
