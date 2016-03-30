@@ -37,7 +37,7 @@ script:
   - sleep 4
   - docker-compose ps
   # Install php dependencies
-  - docker exec -it $(docker-compose ps -q composer) composer install --no-interaction --prefer-dist
+  - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:composer-1-beta1) composer install --no-interaction --prefer-dist
   - docker exec -it $(docker-compose ps -q composer) ls /var/www/html/vendor
   # Seed database
   - docker exec -it $(docker-compose ps -q fpm) php artisan migrate --seed
