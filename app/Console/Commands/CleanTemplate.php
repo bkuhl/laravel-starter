@@ -85,7 +85,7 @@ class CleanTemplate extends Command
 
         $this->info('Removing this command...');
         $this->removeLineContaining(
-            base_path('app/Console/kernel.php'),
+            base_path('app/Console/Commands/kernel.php'),
             'CleanTemplate'
         );
         $this->deleteFile(base_path('app/Console/Commands/CleanTemplate.php'));
