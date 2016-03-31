@@ -70,7 +70,7 @@ class CleanTemplate extends Command
             $this->info('Changing the application namespace');
             $this->call('app:name', ['name' => $name]);
         } else {
-            $this->warn("Application namespace remaining 'App'");
+            $this->warn("Application namespace remaining $name");
         }
 
         $this->info('Reverting readme...');
