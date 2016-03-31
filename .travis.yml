@@ -43,7 +43,7 @@ script:
   - docker-compose ps
   - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpunit
   - docker exec -it $(docker-compose ps -q fpm) php artisan migrate --seed
-  - docker exec -it $(docker-compose ps -q fpm) php artisan clean:template -f
+  - php artisan clean:template -f
   - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpunit
 after_success:
   # Deployable image tags must be in format: [service].[branch].[commit-hash].[timestamp]
