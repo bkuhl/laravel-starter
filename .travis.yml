@@ -27,31 +27,42 @@ before_install:
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
   - cp .env.example .env
+  # Stop the postgres instance travis sets up automatically
   - sudo /etc/init.d/postgresql stop
   # set env vars in the build settings to interact with repositories
   # see https://docs.travis-ci.com/user/environment-variables/#Defining-Variables-in-Repository-Settings
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-script:
+  # Start the docker stuff
   - docker-compose -v
   - docker-compose up -d
   - sleep 4
   - docker-compose ps
-  # Install php dependencies
+install:
+  # Install dev php dependencies
   - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:composer-1-beta1) composer install --no-interaction --prefer-dist
+  # Install production-only npm dependencies & run gulp
+  - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:npm-3) npm install --silent
+  - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:npm-3) gulp --production
+script:
+  # Ensure phpcs triggers a failing build
+  - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpcs --config-set ignore_warnings_on_exit 1
   # Ensure breaking PSR2 compliance fails in CI
-  - php ./vendor/bin/phpcs --config-set ignore_warnings_on_exit 1
-  - php ./vendor/bin/phpcs --standard=PSR2 --ignore=app/Http/routes.php app
+  - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpcs --standard=PSR2 --ignore=app/Http/routes.php app
   # Seed database
   - docker exec -it $(docker-compose ps -q fpm) php artisan migrate --seed
   # Run tests
   - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpunit
+  # Clean up pre-packaged stuff so the Laravel instance is clean and re-run tests to make sure we didn't break something
   - php artisan clean:template -f
   - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpunit
-  # Install npm dependencies & run gulp
-  - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:npm-3) npm rebuild node-sass && npm install --silent
-  - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:npm-3) npm install --global gulp && gulp --production
->>>>>>> master
 after_success:
+  # Remove node dependencies
+  - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:npm-3) rm -rf node_modules
+  # Revert to production-only php dependencies
+  - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' ]]; then docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:composer-1-beta1) composer install --no-interaction --no-dev --prefer-dist ; fi
+  # Build route/config cache
+  - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' ]]; then docker exec -it $(docker-compose ps -q fpm) php artisan route:cache ; fi
+  - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' ]]; then docker exec -it $(docker-compose ps -q fpm) php artisan config:cache ; fi
   # Deployable image tags must be in format: [service].[branch].[commit-hash].[timestamp]
   - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' ]]; then docker tag "${DOCKER_REPO}:fpm" "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" ; fi
 after_script:
