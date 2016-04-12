@@ -39,7 +39,7 @@ before_install:
   - docker-compose ps
 install:
   # Install dev php dependencies
-  - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:composer-1-beta1) composer install --no-interaction --prefer-dist
+  - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:composer-1) composer install --no-interaction --prefer-dist
   # Install production-only npm dependencies & run gulp
   - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:npm-3) npm install --silent
   - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:npm-3) gulp --production
