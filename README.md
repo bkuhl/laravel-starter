@@ -1,4 +1,4 @@
-## Laravel Starter Template [![Build Status](https://travis-ci.org/Realpage/laravel.svg?branch=master)](https://travis-ci.org/Realpage/laravel)
+## Laravel Starter Template [![Build Status](https://travis-ci.org/realpage/laravel.svg?branch=master)](https://travis-ci.org/realpage/laravel)
 
 This [Laravel](https://www.laravel.com) starter template is intended to be forked and used for new projects.
 
