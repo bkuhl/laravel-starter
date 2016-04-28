@@ -20,7 +20,7 @@ before_install:
   - export IMAGE_SLUG="$TRAVIS_BRANCH.${TRAVIS_COMMIT::8}.${TRAVIS_BUILD_ID}"
   # Upgrade docker/docker-compose versions so we can use v2 of the Dockerfile format
   - docker -v
-  - sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install docker-engine
+  - sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install docker-engine=1.10.3-0~trusty
   - docker -v
   - sudo rm /usr/local/bin/docker-compose
   - curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m`" > docker-compose
@@ -39,10 +39,7 @@ before_install:
   - docker-compose ps
 install:
   # Install dev php dependencies
-  - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:composer-1) composer install --no-interaction --prefer-dist
-  # Install production-only npm dependencies & run gulp
-  - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:npm-3) npm install --silent
-  - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:npm-3) gulp --production
+  - docker run -i -v $(pwd):/var/www/html $(docker images -f label=application=laravel -q ) composer install --no-interaction --prefer-dist
 script:
   # Ensure phpcs triggers a failing build
   - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpcs --config-set ignore_warnings_on_exit 1
@@ -56,13 +53,8 @@ script:
   - php artisan clean:template -f
   - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpunit
 after_success:
-  # Remove node dependencies
-  - docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:npm-3) rm -rf node_modules
   # Revert to production-only php dependencies
   - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' || $TRAVIS_BRANCH == 'develop' ]]; then docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:composer-1-beta1) composer install --no-interaction --no-dev --prefer-dist ; fi
-  # Build route/config cache
-  - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' || $TRAVIS_BRANCH == 'develop' ]]; then docker exec -it $(docker-compose ps -q fpm) php artisan route:cache ; fi
-  - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' || $TRAVIS_BRANCH == 'develop' ]]; then docker exec -it $(docker-compose ps -q fpm) php artisan config:cache ; fi
   # Deployable image tags must be in format: [service].[branch].[commit-hash].[timestamp]
   - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' || $TRAVIS_BRANCH == 'develop' ]]; then docker tag "${DOCKER_REPO}:fpm" "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" ; fi
 after_script:
