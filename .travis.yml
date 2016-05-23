@@ -16,7 +16,8 @@ env:
   CACHE_DRIVER: array
   QUEUE_DRIVER: sync
 before_install:
-  - export DOCKER_REPO="${TRAVIS_REPO_SLUG,,}"
+  # Strips out dashes in organization names because they are not allowed in dockerhub
+  - export DOCKER_REPO=`awk -F/ '{gsub("-","",$1)};{print $1"/"$2}' <<<$TRAVIS_REPO_SLUG | tr '[:upper:]' '[:lower:]'`
   - export IMAGE_SLUG="$TRAVIS_BRANCH.${TRAVIS_COMMIT::8}.${TRAVIS_BUILD_ID}"
   # Upgrade docker/docker-compose versions so we can use v2 of the Dockerfile format
   - docker -v
