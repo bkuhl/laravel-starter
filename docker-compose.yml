@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: infrastructure/fpm/Dockerfile
-    image: realpage/laravel:fpm
+    image: realpage/laravel-starter:fpm
     env_file: .env
     volumes:
       - ./:/var/www/html
@@ -13,7 +13,7 @@ services:
     build:
       context: .
       dockerfile: infrastructure/nginx/Dockerfile
-    image: realpage/laravel:nginx
+    image: realpage/laravel-starter:nginx
     volumes:
       - ./infrastructure/nginx:/etc/nginx/conf.d
       - ./public:/var/www/html/public

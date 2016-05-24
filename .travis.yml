@@ -54,10 +54,9 @@ script:
   - php artisan clean:template -f
   - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpunit
 after_success:
-  # Revert to production-only php dependencies
-  - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' || $TRAVIS_BRANCH == 'develop' ]]; then docker run -i -v $(pwd):/var/www/html $(docker images -q realpage/builder:composer-1-beta1) composer install --no-interaction --no-dev --prefer-dist ; fi
   # Deployable image tags must be in format: [service].[branch].[commit-hash].[timestamp]
   - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' || $TRAVIS_BRANCH == 'develop' ]]; then docker tag "${DOCKER_REPO}:fpm" "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" ; fi
+  - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' || $TRAVIS_BRANCH == 'develop' ]]; then docker tag "${DOCKER_REPO}:nginx" "${DOCKER_REPO}:nginx.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:nginx.${IMAGE_SLUG}" ; fi
 after_script:
 - docker images
 notifications:
