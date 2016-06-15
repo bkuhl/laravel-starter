@@ -29,3 +29,20 @@ Route::get('/', function () {
 Route::group(['middleware' => ['web']], function () {
     //
 });
+
+
+/**
+ * Healthcheck to ensure the application is healthy.  When deployed this endpoint will determine healthy nodes
+ * where the application can live.  In the event of network connectivity failure with any external dependencies,
+ * this healthcheck should fail.
+ */
+Route::get('/healthcheck/{token}', function ($token) {
+    if ($token == env('HEALTHCHECK_TOKEN')) {
+        $connection = DB::connection();
+        $connection->disconnect();
+
+        return response('');
+    }
+
+    throw new \Exception('Invalid healthcheck token');
+});
