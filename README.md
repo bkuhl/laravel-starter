@@ -26,6 +26,12 @@ This [Laravel](https://www.laravel.com) starter template is intended to be used 
 <a name="using-this-repo" />
 ### Using This Repository
 
+We recommend [watching this repository](https://help.github.com/articles/watching-repositories/) so you can apply updates made to this project to yours.
+
+_Realpage teams should contact **foundation-devops@realpage.com** using [this email template](https://github.com/realpage/lumen-starter/wiki) to get everything setup._
+
+For everyone else:
+
 1. Clone this repo and delete the `.git` directory
 2. Run `git init` and [change the origin of the repo](https://help.github.com/articles/changing-a-remote-s-url/) to point to your remote repository
 3. Reference the [contributing guide](https://github.com/Realpage/laravel/blob/master/CONTRIBUTING.md) for running this application locally
