@@ -1,7 +1,9 @@
-FROM realpage/php:7.0-fpm
+# This container should be used for any/all CLI processes
+# including cron, queues, etc.
+FROM realpage/php:7.0-cli
 LABEL application="laravel" \
       com.realpage.php.version="7.0" \
-      com.realpage.php.type="fpm"
+      com.realpage.php.type="cli"
 
 # Copy the application files to the container
 ADD . /var/www/html
@@ -22,7 +24,4 @@ RUN apt-get update && apt-get install -y git zip unzip \
     && composer global require hirak/prestissimo \
 
     # production-ready dependencies
-    && composer install  --no-interaction --no-dev --prefer-dist \
-
-    # give the keys to www-data
-    && chown -R www-data:www-data .
+    && composer install  --no-interaction --no-dev --prefer-dist

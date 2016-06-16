@@ -50,13 +50,16 @@ script:
   - docker exec -it $(docker-compose ps -q fpm) php artisan migrate --seed
   # Run tests
   - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpunit
+  # Build cli container
+  - docker build -t "${DOCKER_REPO}:cli" -f infrastructure/cli/Dockerfile .
   # Clean up pre-packaged stuff so the Laravel instance is clean and re-run tests to make sure we didn't break something
   - php artisan clean:template -f
   - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpunit
 after_success:
   # Deployable image tags must be in format: [service].[branch].[commit-hash].[timestamp]
-  - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' || $TRAVIS_BRANCH == 'develop' ]]; then docker tag "${DOCKER_REPO}:fpm" "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" ; fi
-  - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' || $TRAVIS_BRANCH == 'develop' ]]; then docker tag "${DOCKER_REPO}:nginx" "${DOCKER_REPO}:nginx.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:nginx.${IMAGE_SLUG}" ; fi
+  - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' ]]; then docker tag "${DOCKER_REPO}:fpm" "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" ; fi
+  - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' ]]; then docker tag "${DOCKER_REPO}:cli" "${DOCKER_REPO}:cli.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:cli.${IMAGE_SLUG}" ; fi
+  - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' ]]; then docker tag "${DOCKER_REPO}:nginx" "${DOCKER_REPO}:nginx.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:nginx.${IMAGE_SLUG}" ; fi
 after_script:
 - docker images
 notifications:
