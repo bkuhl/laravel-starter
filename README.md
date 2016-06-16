@@ -9,7 +9,7 @@ This [Laravel](https://www.laravel.com) starter template is intended to be used 
 * [What's Included](#whats-included)
 * [Requirements](#requirements)
 * [Using This Repository](#using-this-repo)
-* [Continuous Integration/Deployment Workflow Diagram](http://realpage.github.io/lumen-starter/ci-cd-foundation-lumen-starter-workflow.png)
+* Continuous Integration/Deployment Workflow - [Diagram](http://realpage.github.io/lumen-starter/ci-cd-foundation-lumen-starter-workflow.png) - [Video](https://www.youtube.com/watch?v=vHpInByhQfM)
 * [Roadmap](#roadmap)
 * [FAQ](#faq)
 
