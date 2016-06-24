@@ -37,6 +37,10 @@ For everyone else:
 3. Reference the [contributing guide](https://github.com/Realpage/laravel/blob/master/CONTRIBUTING.md) for running this application locally
 4. `docker exec -it $(docker ps -f name=fpm -q) php artisan clean:template` to strip out example migrations, seeds, tests, etc...
 
+Notes on developing:
+  - This uses [Laravel Elixir](https://laravel.com/docs/5.2/elixir) [:octocat:](https://github.com/laravel/elixir), which acts as an abstraction on top of Gulp
+    - Running `gulp` will provide linting according to the [realpage-ui/development-standards](https://github.com/realpage-ui/development-standards) for CSS and SCSS
+
 ### Development requirements
 
 * [Docker Toolbox](https://www.docker.com/products/docker-toolbox)
@@ -45,7 +49,6 @@ For everyone else:
 <a name="roadmap" />
 ### Roadmap
 
- * Add a cli container for migrations, cli tasks, queue workers, etc.
  * Add cron capabilities to the cli container
  * Add support for elixir to the docker containers
  
