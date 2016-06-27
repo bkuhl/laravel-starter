@@ -10,18 +10,13 @@ ADD . /var/www/html
 
 WORKDIR /var/www/html
 
-# Install Composer
+# Install Composer dependencies
 RUN apt-get update && apt-get install -y git zip unzip \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && php -r "readfile('https://getcomposer.org/installer');" > composer-setup.php \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-    # this hash needs to be updated with each composer version release
-    && php -r "if (hash('SHA384', file_get_contents('composer-setup.php')) === 'bf16ac69bd8b807bc6e4499b28968ee87456e29a3894767b60c2d4dafa3d10d045ffef2aeb2e78827fa5f024fbe93ca2') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
-    && php composer-setup.php --install-dir=/usr/bin --filename=composer \
-    && php -r "unlink('composer-setup.php');" \
-
-    # parallel dependency installation
-    && composer global require hirak/prestissimo \
-
+# Install Composer
+RUN php /var/www/html/infrastructure/install_composer.php
+# parallel dependency installation
+RUN composer global require hirak/prestissimo \
     # production-ready dependencies
-    && composer install  --no-interaction --no-dev --prefer-dist
+    && composer install  --no-interaction --no-dev --prefer-dist \
