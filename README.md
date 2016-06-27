@@ -38,8 +38,26 @@ For everyone else:
 4. `docker exec -it $(docker ps -f name=fpm -q) php artisan clean:template` to strip out example migrations, seeds, tests, etc...
 
 Notes on developing:
-  - This uses [Laravel Elixir](https://laravel.com/docs/5.2/elixir) [:octocat:](https://github.com/laravel/elixir), which acts as an abstraction on top of Gulp
-    - Running `gulp` will provide linting according to the [realpage-ui/development-standards](https://github.com/realpage-ui/development-standards) for CSS and SCSS
+  - This uses [Laravel Elixir](https://laravel.com/docs/master/elixir) [:octocat:](https://github.com/laravel/elixir), which acts as an abstraction on top of Gulp
+  - Running `gulp` will provide linting according to the [realpage-ui/development-standards](https://github.com/realpage-ui/development-standards) for CSS and SCSS
+
+> If you intend to use Laravel Elixir, please read [https://github.com/realpage/laravel-starter/issues/29](https://github.com/realpage/laravel-starter/issues/29) 
+
+#### Dockerhub Setup
+
+Create a repository that mirrors your GitHub namespace/repository except does not include dashes (DockerHub doesn't allow dashes).  The travis configuration is already designed to handle this transition for you.  An example of this would be:
+
+GitHub: my-namespace/my-new-project
+DockerHub: mynamespace/mynewproject
+
+#### Travis-CI Setup
+
+Configure the following environment variables:
+ * `DOCKER_EMAIL`
+ * `DOCKER_USERNAME`
+ * `DOCKER_PASSWORD`
+
+This user needs to have permission to write to the DockerHub repository so that it can push images.
 
 ### Development requirements
 

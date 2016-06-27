@@ -23,8 +23,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        if (class_exists('RealPage\Builder\BuilderServiceProvider')) {
-            $this->app->register(\RealPage\Builder\BuilderServiceProvider::class);
-        }
+        
     }
 }
