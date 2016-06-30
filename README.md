@@ -22,6 +22,7 @@ This [Laravel](https://www.laravel.com) starter template is intended to be used 
     * Checks [psr-2 compliance](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md) with [phpcs](https://github.com/squizlabs/PHP_CodeSniffer).
     * Runs [phpunit](https://phpunit.de/) tests within docker containers.
     * Pushes deploy-ready containers for `develop`, `staging`, `master` branches to [DockerHub](http://hub.docker.com).
+ * [Environment reset script](https://github.com/realpage/laravel-starter/blob/master/infrastructure/reset_environment.php) to allow a dev to easily reset a seeded environment
     
 <a name="using-this-repo" />
 ### Using This Repository
