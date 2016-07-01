@@ -4,17 +4,6 @@ php:
 - 7.0
 env:
   DOCKER_COMPOSE_VERSION: 1.6.2
-  APP_ENV: local
-  APP_DEBUG: true
-  APP_KEY: SomeRandomString
-  DB_CONNECTION: pgsql
-  DB_HOST: postgres
-  DB_PORT: 5432
-  DB_DATABASE: service_db
-  DB_USERNAME: service_user
-  DB_PASSWORD: P@ssw0rd
-  CACHE_DRIVER: array
-  QUEUE_DRIVER: sync
 before_install:
   # Strips out dashes in organization names because they are not allowed in dockerhub
   - export DOCKER_REPO=`awk -F/ '{gsub("-","",$1)};{print $1"/"$2}' <<<$TRAVIS_REPO_SLUG | tr '[:upper:]' '[:lower:]'`
