@@ -19,4 +19,4 @@ RUN php /var/www/html/infrastructure/install_composer.php
 # parallel dependency installation
 RUN composer global require hirak/prestissimo \
     # production-ready dependencies
-    && composer install  --no-interaction --no-dev --prefer-dist \
+    && composer install  --no-interaction --optimize-autoloader --no-dev --prefer-dist \
