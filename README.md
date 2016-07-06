@@ -23,6 +23,7 @@ This [Laravel](https://www.laravel.com) starter template is intended to be used 
     * Runs [phpunit](https://phpunit.de/) tests within docker containers.
     * Pushes deploy-ready containers for `develop`, `staging`, `master` branches to [DockerHub](http://hub.docker.com).
  * [Environment reset script](https://github.com/realpage/laravel-starter/blob/master/infrastructure/reset_environment.php) to allow a dev to easily reset a seeded environment
+ * [Example configuration](infrastructure/rancher-example/README.md) for deploying to [Rancher](http://rancher.com).
     
 <a name="using-this-repo" />
 ### Using This Repository

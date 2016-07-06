@@ -1,0 +1,14 @@
+db:
+  scale: 1
+queue:
+  scale: 1
+redis:
+  scale: 1
+migrations:
+  scale: 1
+reset-database:
+  scale: 1
+web:
+  scale: 1
+fpm:
+  scale: 1

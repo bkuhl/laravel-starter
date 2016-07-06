@@ -83,6 +83,9 @@ class CleanTemplate extends Command
         $this->info('Removing Travis CI notifications...');
         $this->removeTravisNotification();
 
+        $this->info('Removing example Rancher configuration...');
+        $this->deleteDirectory(base_path('infrastructure/rancher'));
+
         $this->info('Removing this command...');
         $this->removeLineContaining(
             base_path('app/Console/Kernel.php'),
@@ -98,6 +101,18 @@ class CleanTemplate extends Command
             $system->delete($filename);
         } else {
             $this->warn("$type already deleted.");
+            return false;
+        }
+        return true;
+    }
+
+    private function deleteDirectory($dirname, $type = null)
+    {
+        $system = new Filesystem();
+        if ($system->exists($dirname)) {
+            $system->deleteDirectory($dirname);
+        } else {
+            $this->warn("$type already deleted");
             return false;
         }
         return true;
