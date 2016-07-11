@@ -1,4 +1,4 @@
-FROM realpage/php:7.0-fpm
+FROM realpage/php:7.0-fpm-alpine
 LABEL application="laravel" \
       com.realpage.php.version="7.0" \
       com.realpage.php.type="fpm"
@@ -9,8 +9,8 @@ ADD . /var/www/html
 WORKDIR /var/www/html
 
 # Install Composer dependencies
-RUN apt-get update && apt-get install -y git zip unzip \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN apk add --update --no-cache git zip unzip \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install Composer
 RUN php /var/www/html/infrastructure/install_composer.php
