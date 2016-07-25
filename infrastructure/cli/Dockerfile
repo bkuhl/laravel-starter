@@ -33,3 +33,6 @@ USER root
 
 # Remove composer installation dependencies
 RUN apk del libmcrypt git zip unzip
+
+# Make sure when users get into the container they aren't root
+USER www-data
