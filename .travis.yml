@@ -32,18 +32,18 @@ install:
   - docker run -i -v $(pwd):/var/www/html $(docker images -f label=application=laravel -q ) composer install --no-interaction --prefer-dist
 script:
   # Ensure phpcs triggers a failing build
-  - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpcs --config-set ignore_warnings_on_exit 1
+  - docker exec -it $(docker-compose ps -q fpm) sh -c "vendor/bin/phpcs --config-set ignore_warnings_on_exit 1"
   # Ensure breaking PSR2 compliance fails in CI
-  - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpcs --standard=PSR2 --ignore=app/Http/routes.php app
+  - docker exec -it $(docker-compose ps -q fpm) sh -c "vendor/bin/phpcs --standard=PSR2 --ignore=app/Http/routes.php app"
   # Seed database
-  - docker exec -it $(docker-compose ps -q fpm) php artisan migrate --seed
+  - docker exec -it $(docker-compose ps -q fpm) sh -c "php artisan migrate --seed"
   # Run tests
-  - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpunit
+  - docker exec -it $(docker-compose ps -q fpm) sh -c "vendor/bin/phpunit"
   # Build cli container
   - docker build -t "${DOCKER_REPO}:cli" -f infrastructure/cli/Dockerfile .
   # Clean up pre-packaged stuff so the Laravel instance is clean and re-run tests to make sure we didn't break something
   - php artisan clean:template -f
-  - docker exec -it $(docker-compose ps -q fpm) vendor/bin/phpunit
+  - docker exec -it $(docker-compose ps -q fpm) sh -c "vendor/bin/phpunit"
 after_success:
   # Deployable image tags must be in format: [service].[branch].[commit-hash].[timestamp]
   - if [[ $TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging' ]]; then docker tag "${DOCKER_REPO}:fpm" "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" ; fi
@@ -53,4 +53,4 @@ after_script:
 - docker images
 notifications:
   slack:
-    secure: hlwOkg0XGJBxhAb/6DIHcljEprJCj7Ilv9vEjyqDMjMx7bhOZ8dOb3VEg+ao6UN4eNNNfcQkS0gqvOt5YfY3CZCOrDR7mJnSL5GNGVxkbqNKaQ2bqCn5CCB0Jjb5Jwj+q5x/RB7ktWvP49KnPeiHqouVnQtiLAtPcV9hoYG0pnoI/NCbywukIN35fs5WYLWm/ozdqsaH91vVtpq3OmarKUiIxXu4/Ojy7tn+lWHMQmB+MRvE+QC0c1nWLeTNNaZ/PWEghmiuXWSSurvyiqVUQA81tSGC7WcX6ObAG02gt4LTG2w+bO42/yKjJhRhfkN8LKnTnsI1RLzJy0KwZ/XkYtdQqTjcYRqC75DWGAONGdizG9VwUtIyY3OXGXFi1oeGCxaFlma2xqD6a6Haae+MKmkLUuFvy3lEYPtC9/iSziNkpozjgC+1vYLudOkfftvKOUz3CzhsVzVTTzBAbodZAP/7v4wPEbYZ0G3nTs25nedel/6FCtH+BonS19SUb9UqcWwBx5d8XyHbaECPtXf+5iPVOFDYURLlYpLhNx+DszCYorKcQOZ7/MeONK2QPw5Ddd9z4qAQli+JPlXl0IG4ELt3QKQnVkpEWA+mAdS6j6I5oIYaxm9er/j4+tWAb/GmXHcWvvMdo/BxdUvdVAZ91JvoKNkiMV2M/sri0beVdmM=
+    secure: ${SLACK_TOKEN}
