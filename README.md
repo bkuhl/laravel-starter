@@ -55,7 +55,6 @@ DockerHub: mynamespace/mynewproject
 #### Travis-CI Setup
 
 Configure the following environment variables:
- * `DOCKER_EMAIL`
  * `DOCKER_USERNAME`
  * `DOCKER_PASSWORD`
 

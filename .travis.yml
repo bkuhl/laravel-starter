@@ -3,14 +3,14 @@ services: docker
 php:
 - 7.0
 env:
-  DOCKER_COMPOSE_VERSION: 1.6.2
+  DOCKER_COMPOSE_VERSION: 1.8.0
 before_install:
   # Strips out dashes in organization names because they are not allowed in dockerhub
   - export DOCKER_REPO=`awk -F/ '{gsub("-","",$1)};{print $1"/"$2}' <<<$TRAVIS_REPO_SLUG | tr '[:upper:]' '[:lower:]'`
   - export IMAGE_SLUG="$TRAVIS_BRANCH.${TRAVIS_COMMIT::8}.${TRAVIS_BUILD_ID}"
-  # Upgrade docker/docker-compose versions so we can use v2 of the Dockerfile format
+  # Upgrade docker/docker-compose
   - docker -v
-  - sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install docker-engine=1.10.3-0~trusty
+  - sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install docker-engine=1.12.0-0~trusty
   - docker -v
   - sudo rm /usr/local/bin/docker-compose
   - curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m`" > docker-compose
@@ -21,7 +21,7 @@ before_install:
   - sudo /etc/init.d/postgresql stop
   # set env vars in the build settings to interact with repositories
   # see https://docs.travis-ci.com/user/environment-variables/#Defining-Variables-in-Repository-Settings
-  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
   # Start the docker stuff
   - docker-compose -v
   - docker-compose up -d
