@@ -1,4 +1,4 @@
-FROM realpage/nginx:1.10
+FROM realpage/nginx:1.11
 MAINTAINER Foundation DevOps foundation-devops@realpage.com
 LABEL com.realpage.nginx.version="1.10"
 
