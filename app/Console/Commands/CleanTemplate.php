@@ -75,9 +75,8 @@ class CleanTemplate extends Command
 
         $this->info('Reverting readme...');
         $system = new Filesystem();
-        $filename = base_path('readme.md');
-        if ($system->exists($filename)) {
-            $system->put($filename, '');
+        if ($this->deleteFile(base_path('README.md'))) {
+            $system->move(base_path('README_DEFAULT.md'), base_path('README.md'));
         }
 
         $this->info('Removing Travis CI notifications...');
@@ -92,6 +91,8 @@ class CleanTemplate extends Command
             'CleanTemplate'
         );
         $this->deleteFile(base_path('app/Console/Commands/CleanTemplate.php'));
+
+        $this->warn("Review links in README.md and CONTRIBUTING.md to make sure they're relevant to this project");
     }
 
     private function deleteFile($filename, $type = null)

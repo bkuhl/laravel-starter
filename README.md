@@ -21,7 +21,7 @@ This [Laravel](https://www.laravel.com) starter template is intended to be used 
  * [Travis-CI](https://travis-ci.org) integration:
     * Checks [psr-2 compliance](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md) with [phpcs](https://github.com/squizlabs/PHP_CodeSniffer).
     * Runs [phpunit](https://phpunit.de/) tests within docker containers.
-    * Pushes deploy-ready containers for `develop`, `staging`, `master` branches to [DockerHub](http://hub.docker.com).
+    * Pushes deploy-ready containers for `staging` and `master` branches to [DockerHub](http://hub.docker.com).
  * [Environment reset script](https://github.com/realpage/laravel-starter/blob/master/infrastructure/reset_environment.php) to allow a dev to easily reset a seeded environment
  * [Example configuration](infrastructure/rancher-example/README.md) for deploying to [Rancher](http://rancher.com).
     
@@ -68,7 +68,6 @@ This user needs to have permission to write to the DockerHub repository so that 
 <a name="roadmap" />
 ### Roadmap
 
- * Add cron capabilities to the cli container
  * Add support for elixir to the docker containers
  
 <a name="faq" />
