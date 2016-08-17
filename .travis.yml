@@ -1,21 +1,9 @@
-language: php
 services: docker
-php:
-- 7.0
-env:
-  DOCKER_COMPOSE_VERSION: 1.8.0
 before_install:
   # Strips out dashes in organization names because they are not allowed in dockerhub
   - export DOCKER_REPO=`awk -F/ '{gsub("-","",$1)};{print $1"/"$2}' <<<$TRAVIS_REPO_SLUG | tr '[:upper:]' '[:lower:]'`
   - export IMAGE_SLUG="$TRAVIS_BRANCH.${TRAVIS_COMMIT::8}.${TRAVIS_BUILD_ID}"
-  # Upgrade docker/docker-compose
   - docker -v
-  - sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install docker-engine=1.12.0-0~trusty
-  - docker -v
-  - sudo rm /usr/local/bin/docker-compose
-  - curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m`" > docker-compose
-  - chmod +x docker-compose
-  - sudo mv docker-compose /usr/local/bin
   - cp .env.example .env
   # Stop the postgres instance travis sets up automatically
   - sudo /etc/init.d/postgresql stop
@@ -42,7 +30,7 @@ script:
   # Build cli container
   - docker build -t "${DOCKER_REPO}:cli" -f infrastructure/cli/Dockerfile .
   # Clean up pre-packaged stuff so the Laravel instance is clean and re-run tests to make sure we didn't break something
-  - php artisan clean:template -f
+  - docker exec -it $(docker-compose ps -q fpm) sh -c "php artisan clean:template -f"
   - docker exec -it $(docker-compose ps -q fpm) sh -c "vendor/bin/phpunit"
 after_success:
   # Deployable image tags must be in format: [service].[branch].[commit-hash].[timestamp]
