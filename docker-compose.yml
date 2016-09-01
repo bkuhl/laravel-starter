@@ -14,6 +14,7 @@ services:
       context: .
       dockerfile: infrastructure/nginx/Dockerfile
     image: realpage/laravel-starter:nginx
+    env_file: .env
     volumes:
       - ./infrastructure/nginx:/etc/nginx/conf.d
       - ./public:/var/www/html/public
