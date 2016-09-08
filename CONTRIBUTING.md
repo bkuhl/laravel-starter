@@ -15,3 +15,17 @@ Note: Elixir/Gulp is not yet supported
 
 6. Run `docker exec -it $(docker ps -f name=fpm -q) php artisan migrate --seed` (or [use the shortcut](https://github.com/realpage/lumen/tree/readme-updates#is-there-a-shortcut-for-running-commands-within-specific-containers) ) to migrate and seed the database
 7. Now visit the application at http://192.168.99.100 (the docker-machine's default IP)
+
+### Upgrading Laravel
+
+Objective: Keep an exact mirror of the latest Laravel repo with our changes in top of it.
+
+When upgrading to new major or minor versions of Laravel, do not follow the upgrade guide.  The upgrade guide describes the minimal changes that need to be made to get a project functional on the new version.  To ensure we maintain an exact mirror, here's one method of upgrading this repository: 
+ 
+ * Checkout this repo
+ * Create an upgrade branch (e.g. `laravel-5.3-upgrade`)
+ * Create a new project for the target version in another directory
+ * Overwrite your local branch with the contents of the new project (e.g. - `cp -rf /path/to/new-project /path/to/upgrade/branch`)
+ * Use `git diff` to review what's changed and selectively revert/copy over changes to the new files
+ * Use `diff --brief -r /path/to/new-project /path/to/upgrade/branch` to compare the fresh laravel project with the starter and analyze that to see which directories/files should be removed from the starter
+ * Run `phpunit` and `artisan` to verify nothing's broken

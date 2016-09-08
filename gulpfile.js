@@ -1,8 +1,6 @@
-var elixir = require('laravel-elixir');
-var scss   = require('postcss-scss');
-var config = elixir.config;
+const elixir = require('laravel-elixir');
 
-require('laravel-elixir-stylelint');
+require('laravel-elixir-vue');
 
 /*
  |--------------------------------------------------------------------------
@@ -15,10 +13,7 @@ require('laravel-elixir-stylelint');
  |
  */
 
-elixir(function(mix) {
-    mix
-      .stylelint([
-        config.get('assets.css.sass.folder') + '/**/*.scss'
-      ], {syntax: scss})
-      .sass('app.scss');
+elixir(mix => {
+    mix.sass('app.scss')
+       .webpack('app.js');
 });
