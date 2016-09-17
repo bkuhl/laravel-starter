@@ -58,7 +58,7 @@ server {
         # ------------------ End redirect to SSL -----------------
 
         # look for local files on the container before sending the request to fpm
-        try_files ${DOLLAR}uri ${DOLLAR}uri/ /index.html;
+        try_files ${DOLLAR}uri ${DOLLAR}uri/ /index.html /index.php?${DOLLAR}query_string;
 
         # Add HTTP Strict Transport Security for good measure.
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains;";
