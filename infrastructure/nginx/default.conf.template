@@ -70,11 +70,11 @@ server {
         fastcgi_pass            fpm:9000;
         fastcgi_index           index.php;
         include                 fastcgi_params;
-        fastcgi_param           REQUEST_METHOD  $request_method;
-        fastcgi_param           SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        fastcgi_param           QUERY_STRING    $query_string;
-        fastcgi_param           CONTENT_TYPE    $content_type;
-        fastcgi_param           CONTENT_LENGTH  $content_length;
+        fastcgi_param           REQUEST_METHOD  ${DOLLAR}request_method;
+        fastcgi_param           SCRIPT_FILENAME ${DOLLAR}document_root${DOLLAR}fastcgi_script_name;
+        fastcgi_param           QUERY_STRING    ${DOLLAR}query_string;
+        fastcgi_param           CONTENT_TYPE    ${DOLLAR}content_type;
+        fastcgi_param           CONTENT_LENGTH  ${DOLLAR}content_length;
         # Httpoxy exploit (https://httpoxy.org/) fix
         fastcgi_param           HTTP_PROXY "";
    }
