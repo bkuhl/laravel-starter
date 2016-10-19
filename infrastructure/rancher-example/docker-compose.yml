@@ -73,9 +73,6 @@ web:
   ports:
   - 4443:2443/tcp
   - 4000:80/tcp
-  environment:
-    APP_ENV: staging
-    APP_URL: https://[URL-TO-STAGING].com
   log_driver: ''
   labels:
     io.rancher.container.pull_image: always

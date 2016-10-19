@@ -9,6 +9,6 @@ migrations:
 reset-database:
   scale: 1
 web:
-  scale: 1
+  scale: 2
 fpm:
-  scale: 1
+  scale: 2
