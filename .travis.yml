@@ -34,9 +34,9 @@ script:
   - docker exec -it $(docker-compose ps -q fpm) sh -c "vendor/bin/phpunit"
 after_success:
   # Deployable image tags must be in format: [service].[branch].[commit-hash].[timestamp]
-  - if [[ $TRAVIS_PULL_REQUEST_BRANCH == '' && ($TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging') ]]; then docker tag "${DOCKER_REPO}:fpm" "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" ; fi
-  - if [[ $TRAVIS_PULL_REQUEST_BRANCH == '' && ($TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging') ]]; then docker tag "${DOCKER_REPO}:cli" "${DOCKER_REPO}:cli.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:cli.${IMAGE_SLUG}" ; fi
-  - if [[ $TRAVIS_PULL_REQUEST_BRANCH == '' && ($TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging') ]]; then docker tag "${DOCKER_REPO}:nginx" "${DOCKER_REPO}:nginx.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:nginx.${IMAGE_SLUG}" ; fi
+  - if [[ $TRAVIS_PULL_REQUEST = false && ($TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging') ]]; then docker tag "${DOCKER_REPO}:fpm" "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" ; fi
+  - if [[ $TRAVIS_PULL_REQUEST = false && ($TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging') ]]; then docker tag "${DOCKER_REPO}:cli" "${DOCKER_REPO}:cli.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:cli.${IMAGE_SLUG}" ; fi
+  - if [[ $TRAVIS_PULL_REQUEST = false && ($TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging') ]]; then docker tag "${DOCKER_REPO}:nginx" "${DOCKER_REPO}:nginx.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:nginx.${IMAGE_SLUG}" ; fi
 after_script:
 - docker images
 notifications:
