@@ -1,8 +1,8 @@
 # This container should be used for any/all CLI processes
 # including cron, queues, etc.
-FROM realpage/php:7.0-alpine
+FROM realpage/php:7.1-alpine
 LABEL application="laravel" \
-      com.realpage.php.version="7.0" \
+      com.realpage.php.version="7.1" \
       com.realpage.php.type="cli"
 
 # Copy the application files to the container

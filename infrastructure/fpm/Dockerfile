@@ -1,6 +1,6 @@
-FROM realpage/php:7.0-fpm-alpine
+FROM realpage/php:7.1-fpm-alpine
 LABEL application="laravel" \
-      com.realpage.php.version="7.0" \
+      com.realpage.php.version="7.1" \
       com.realpage.php.type="fpm"
 
 # Copy the application files to the container
