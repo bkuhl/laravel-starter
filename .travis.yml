@@ -13,26 +13,27 @@ before_install:
   # set env vars in the build settings to interact with repositories
   # see https://docs.travis-ci.com/user/environment-variables/#Defining-Variables-in-Repository-Settings
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  # Build front-end assets
+  - npm install
+  - npm run production
   # Start the docker stuff
   - docker-compose -v
   - docker-compose up -d
   - sleep 4
-  # Build front-end assets
-  - npm install production
   - docker-compose ps
   # Build cli container
   - docker build -t "${DOCKER_REPO}:cli" -f infrastructure/cli/Dockerfile .
 install:
   # Install dev php dependencies
-  - docker exec -it $(docker-compose ps -q fpm) sh -c "composer install --no-interaction --prefer-dist"
+  - docker-compose exec fpm sh -c "composer install --no-interaction --prefer-dist"
 script:
   # Seed database
-  - docker exec -it $(docker-compose ps -q fpm) sh -c "php artisan migrate --seed"
+  - docker-compose exec fpm sh -c "php artisan migrate --seed"
   # Run tests
-  - docker exec -it $(docker-compose ps -q fpm) sh -c "vendor/bin/phpunit"
+  - docker-compose exec fpm sh -c "vendor/bin/phpunit"
   # Clean up pre-packaged stuff so the Laravel instance is clean and re-run tests to make sure we didn't break something
-  - docker exec -it $(docker-compose ps -q fpm) sh -c "php artisan clean:template -f"
-  - docker exec -it $(docker-compose ps -q fpm) sh -c "vendor/bin/phpunit"
+  - docker-compose exec fpm sh -c "php artisan clean:template -f"
+  - docker-compose exec fpm sh -c "vendor/bin/phpunit"
 after_success:
   # Deployable image tags must be in format: [service].[branch].[commit-hash].[timestamp]
   - if [[ $TRAVIS_PULL_REQUEST = false && ($TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging') ]]; then docker tag "${DOCKER_REPO}:fpm" "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" ; fi

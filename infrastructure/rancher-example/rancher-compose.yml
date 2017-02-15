@@ -4,6 +4,8 @@ queue:
   scale: 1
 redis:
   scale: 1
+cron:
+  scale: 1
 migrations:
   scale: 1
 reset-database:

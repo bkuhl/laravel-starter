@@ -14,6 +14,28 @@ redis:
   tty: true
   image: redis:3.0-alpine
   stdin_open: true
+cron:
+  image: realpage/laravel-starter:cli.staging.[HASH]
+    environment:
+      APP_ENV: staging
+      APP_KEY: [KEY]
+      APP_URL: http://www.mydomain.com
+      CACHE_DRIVER: redis
+      QUEUE_DRIVER: redis
+      DB_DATABASE: my_app
+      DB_USERNAME: my_app
+      DB_PASSWORD: changeme
+    stdin_open: true
+    tty: true
+    links:
+    - database:database
+    command:
+    - crond
+    - -f
+    - -d
+    - '8'
+    labels:
+      io.rancher.container.pull_image: always
 queue:
   environment:
     APP_ENV: staging
