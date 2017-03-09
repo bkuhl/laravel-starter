@@ -29,6 +29,7 @@ cron:
     tty: true
     links:
     - database:database
+    user: root
     command:
     - crond
     - -f
