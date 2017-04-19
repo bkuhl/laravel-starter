@@ -1,34 +1,22 @@
-db:
-  environment:
-    POSTGRES_DB: my_app
-    POSTGRES_PASSWORD: changeme
-    POSTGRES_USER: my_app
-  labels:
-    io.rancher.container.pull_image: always
-  tty: true
-  image: postgres:9.6
-  stdin_open: true
-redis:
-  labels:
-    io.rancher.container.pull_image: always
-  tty: true
-  image: redis:3.0-alpine
-  stdin_open: true
-cron:
-  image: realpage/laravel-starter:cli.staging.[HASH]
+version: '2'
+services:
+  cron:
+    image: realpage/laravel-starter:cli-staging-latest
     environment:
       APP_ENV: staging
-      APP_KEY: [KEY]
-      APP_URL: http://www.mydomain.com
+      APP_KEY: [CHANGE_ME]
+      APP_URL: https://www.my-app.com
       CACHE_DRIVER: redis
-      QUEUE_DRIVER: redis
       DB_DATABASE: my_app
+      DB_PASSWORD: [CHANGE_ME]
       DB_USERNAME: my_app
-      DB_PASSWORD: changeme
+      QUEUE_DRIVER: redis
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
     stdin_open: true
     tty: true
     links:
-    - database:database
+    - db:db
     user: root
     command:
     - crond
@@ -37,90 +25,127 @@ cron:
     - '8'
     labels:
       io.rancher.container.pull_image: always
-queue:
-  environment:
-    APP_ENV: staging
-    APP_URL: http://www.mydomain.com
-    CACHE_DRIVER: redis
-    QUEUE_DRIVER: redis
-    DB_DATABASE: my_app
-    DB_USERNAME: my_app
-    DB_PASSWORD: changeme
-  labels:
-    io.rancher.container.pull_image: always
-  command:
-  - php
-  - /var/www/html/artisan
-  - queue:listen
-  - --sleep=3
-  tty: true
-  image: realpage/laravel-starter:cli.staging.[HASH]
-  stdin_open: true
-migrations:
-  environment:
-    APP_ENV: staging
-    CACHE_DRIVER: redis
-    DB_DATABASE: my_app
-    DB_USERNAME: my_app
-    DB_PASSWORD: changeme
-  labels:
-    io.rancher.container.pull_image: always
-    io.rancher.container.start_once: 'true'
-  command:
-  - php
-  - artisan
-  - migrate
-  - --force
-  tty: true
-  image: realpage/laravel-starter:cli.staging.[HASH]
-  stdin_open: true
-reset-database:
-  environment:
-    APP_ENV: staging
-    CACHE_DRIVER: redis
-    DB_DATABASE: my_app
-    DB_USERNAME: my_app
-    DB_PASSWORD: changeme
-  log_driver: ''
-  labels:
-    io.rancher.container.pull_image: always
-    io.rancher.container.start_once: 'true'
-  tty: true
-  command:
-  - php
-  - infrastructure/reset_environment.php
-  log_opt: {}
-  image: realpage/laravel-starter:cli.staging.[HASH]
-  stdin_open: true
-web:
-  ports:
-  - 4443:2443/tcp
-  - 4000:80/tcp
-  log_driver: ''
-  labels:
-    io.rancher.container.pull_image: always
-  tty: true
-  log_opt: {}
-  image: realpage/laravel-starter:nginx.staging.[HASH]
-  links:
-  - 'fpm:'
-  stdin_open: true
-fpm:
-  environment:
-    APP_ENV: staging
-    APP_KEY: [APP_KEY]
-    APP_URL: http://www.mydomain.com
-    CACHE_DRIVER: redis
-    QUEUE_DRIVER: redis
-    DB_DATABASE: my_app
-    DB_USERNAME: my_app
-    DB_PASSWORD: changeme
-    DB_PORT: '5432'
-    HEALTHCHECK_TOKEN: [HEALTHCHECK_TOKEN]
-  labels:
-    io.rancher.container.pull_image: always
-  tty: true
-  image: realpage/laravel-starter:fpm.staging.[HASH]
-  links:
-  - db:db
-  stdin_open: true
+      deploy: cli
+  fpm:
+    image: levelonedev/answer-automation-phoenix:fpm-dev-latest
+    environment:
+      APP_DEBUG: 'true'
+      APP_ENV: staging
+      APP_KEY: [CHANGE_ME]
+      APP_URL: https://www.my-app.com
+      CACHE_DRIVER: redis
+      DB_DATABASE: my_app
+      DB_PASSWORD: [CHANGE_ME]
+      DB_PORT: '5432'
+      DB_USERNAME: my_app
+      HEALTHCHECK_TOKEN: [CHANGE_ME]
+      QUEUE_DRIVER: redis
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+    stdin_open: true
+    tty: true
+    links:
+    - db:db
+    - redis:redis
+    labels:
+      io.rancher.container.pull_image: always
+      deploy: fpm
+  nginx:
+    image: levelonedev/answer-automation-phoenix:nginx-dev-latest
+    stdin_open: true
+    tty: true
+    links:
+    - fpm:fpm
+    labels:
+      io.rancher.container.pull_image: always
+      deploy: nginx
+  migrations:
+    image: realpage/laravel-starter:cli-staging-latest
+    environment:
+      APP_ENV: staging
+      CACHE_DRIVER: redis
+      DB_DATABASE: my_app
+      DB_PASSWORD: [CHANGE_ME]
+      DB_USERNAME: my_app
+      QUEUE_DRIVER: redis
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+    stdin_open: true
+    tty: true
+    links:
+    - db:db
+    - redis:redis
+    command:
+    - php
+    - /var/www/html/artisan
+    - migrate
+    - --force
+    labels:
+      io.rancher.container.start_once: 'true'
+      io.rancher.container.pull_image: always
+      deploy: cli
+  reset-database:
+    image: realpage/laravel-starter:cli-staging-latest
+    environment:
+      APP_ENV: staging
+      CACHE_DRIVER: redis
+      DB_DATABASE: my_app
+      DB_PASSWORD: [CHANGE_ME]
+      DB_USERNAME: my_app
+      QUEUE_DRIVER: redis
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+    stdin_open: true
+    tty: true
+    links:
+    - db:db
+    - redis:redis
+    command:
+    - php
+    - infrastructure/reset_environment.php
+    labels:
+      io.rancher.container.start_once: 'true'
+      io.rancher.container.pull_image: always
+      deploy: cli
+  db:
+    image: rancher/external-service
+  redis:
+    image: redis:3-alpine
+    stdin_open: true
+    tty: true
+    labels:
+      io.rancher.container.pull_image: always
+  queue:
+    image: realpage/laravel-starter:cli-staging-latest
+    environment:
+      APP_ENV: staging
+      APP_KEY: [CHANGE_ME]
+      APP_URL: https://www.my-app.com
+      CACHE_DRIVER: redis
+      DB_DATABASE: my_app
+      DB_PASSWORD: [CHANGE_ME]
+      DB_USERNAME: my_app
+      QUEUE_DRIVER: redis
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+    stdin_open: true
+    tty: true
+    links:
+    - db:db
+    command:
+    - php
+    - /var/www/html/artisan
+    - queue:listen
+    - --sleep=3
+    - --tries=3
+    - --timeout=0
+    labels:
+      io.rancher.container.pull_image: always
+      deploy: cli
+  load-balancer:
+    image: rancher/lb-service-haproxy:v0.6.2
+    ports:
+    - 80:80/tcp
+    labels:
+      io.rancher.container.agent.role: environmentAdmin
+      io.rancher.container.create_agent: 'true'
