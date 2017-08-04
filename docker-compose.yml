@@ -1,29 +1,23 @@
-version: '2'
+version: '3'
 
 services:
-  fpm:
-    build:
-      context: .
-      dockerfile: infrastructure/fpm/Dockerfile
-    image: realpage/laravel-starter:fpm
-    env_file: .env
-    volumes:
-      - ./:/var/www/html
   web:
     build:
       context: .
-      dockerfile: infrastructure/nginx/Dockerfile
-    image: realpage/laravel-starter:nginx
+      dockerfile: infrastructure/web/Dockerfile
+    image: bkuhl/laravel-starter:web
+    env_file: .env
     volumes:
-      - ./infrastructure/nginx:/etc/nginx/conf.d
-      - ./public:/var/www/html/public
+      - ./:/var/www/html
+      - ./infrastructure/web:/etc/nginx/conf.d
     ports:
       - "80:80"
   db:
-    image: postgres:9.6
+    image: mysql:8.0
     ports:
-      - "5432:5432"
+      - "3306:3306"
     environment:
-      POSTGRES_USER: service_user
-      POSTGRES_PASSWORD: P@ssw0rd
-      POSTGRES_DB: service_db
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: app_database
+      MYSQL_USER: user
+      MYSQL_PASSWORD: secret

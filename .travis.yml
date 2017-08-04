@@ -1,46 +1,34 @@
 services: docker
-language: node_js
-node_js:
-  - 6
+
 before_install:
-  # Strips out dashes in organization names because they are not allowed in dockerhub
-  - export DOCKER_REPO=`awk -F/ '{gsub("-","",$1)};{print $1"/"$2}' <<<$TRAVIS_REPO_SLUG | tr '[:upper:]' '[:lower:]'`
-  - export IMAGE_SLUG="$TRAVIS_BRANCH.${TRAVIS_COMMIT::8}.${TRAVIS_BUILD_ID}"
   - docker -v
+  # Use the env config
   - cp .env.example .env
   # Stop the postgres instance travis sets up automatically
   - sudo /etc/init.d/postgresql stop
+  - sudo service mysql stop
   # set env vars in the build settings to interact with repositories
   # see https://docs.travis-ci.com/user/environment-variables/#Defining-Variables-in-Repository-Settings
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  # Build front-end assets
-  - npm install
-  - npm run production
-  # Start the docker stuff
-  - docker-compose -v
-  - docker-compose up -d
-  - sleep 4
-  - docker-compose ps
-  # Build cli container
-  - docker build -t "${DOCKER_REPO}:cli" -f infrastructure/cli/Dockerfile .
 install:
+  # Start the docker stuff
+  - docker-compose up -d
+  - sleep 10
   # Install dev php dependencies
-  - docker-compose exec fpm sh -c "composer install --no-interaction --prefer-dist"
+  - docker-compose exec web sh -c "composer install --no-interaction --prefer-dist"
 script:
   # Seed database
-  - docker-compose exec fpm sh -c "php artisan migrate --seed"
+  - docker-compose exec web sh -c "php artisan migrate --seed"
   # Run tests
-  - docker-compose exec fpm sh -c "vendor/bin/phpunit"
+  - docker-compose exec web sh -c "composer test"
+
   # Clean up pre-packaged stuff so the Laravel instance is clean and re-run tests to make sure we didn't break something
   - docker-compose exec fpm sh -c "php artisan clean:template -f"
   - docker-compose exec fpm sh -c "vendor/bin/phpunit"
+
+  # Build cli container
+  - docker build -t "bkuhl/laravel-starter:cli" -f infrastructure/cli/Dockerfile .
 after_success:
-  # Deployable image tags must be in format: [service].[branch].[commit-hash].[timestamp]
-  - if [[ $TRAVIS_PULL_REQUEST = false && ($TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging') ]]; then docker tag "${DOCKER_REPO}:fpm" "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:fpm.${IMAGE_SLUG}" ; fi
-  - if [[ $TRAVIS_PULL_REQUEST = false && ($TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging') ]]; then docker tag "${DOCKER_REPO}:cli" "${DOCKER_REPO}:cli.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:cli.${IMAGE_SLUG}" ; fi
-  - if [[ $TRAVIS_PULL_REQUEST = false && ($TRAVIS_BRANCH == 'master' || $TRAVIS_BRANCH == 'staging') ]]; then docker tag "${DOCKER_REPO}:nginx" "${DOCKER_REPO}:nginx.${IMAGE_SLUG}" && docker push "${DOCKER_REPO}:nginx.${IMAGE_SLUG}" ; fi
-after_script:
-- docker images
-notifications:
-  slack:
-    secure: ${SLACK_TOKEN}
+  # Deployable image tags must be in format: web-latest, cli-latest, nginx-latest
+  - if [[ $TRAVIS_BRANCH == 'master' ]]; then docker tag "bkuhl/laravel-starter:web" "bkuhl/laravel-starter:web-latest" && docker push "bkuhl/laravel-starter:web-latest" ; fi
+  - if [[ $TRAVIS_BRANCH == 'master' ]]; then docker tag "bkuhl/laravel-starter:cli" "bkuhl/laravel-starter:cli-latest" && docker push "bkuhl/laravel-starter:cli-latest" ; fi
