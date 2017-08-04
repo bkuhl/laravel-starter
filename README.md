@@ -14,6 +14,7 @@ This [Laravel](https://www.laravel.com) starter template is intended to be used 
 * [FAQ](#faq)
 
 <a name="whats-included" />
+
 ### What's Included
 
  * Latest version of Laravel.
@@ -26,6 +27,7 @@ This [Laravel](https://www.laravel.com) starter template is intended to be used 
  * [Example configuration](infrastructure/rancher-example/README.md) for deploying to [Rancher](http://rancher.com).
     
 <a name="using-this-repo" />
+
 ### Using This Repository
 
 We recommend [watching this repository](https://help.github.com/articles/watching-repositories/) so you can apply updates made to this project to yours.
@@ -66,14 +68,17 @@ This user needs to have permission to write to the DockerHub repository so that 
 * [GIT Version Control client](https://git-scm.com/)
 
 <a name="roadmap" />
+
 ### Roadmap
 
- * Add support for elixir to the docker containers
+ * Add support for mix to the docker containers
  
 <a name="faq" />
+
 ### FAQ
 
 <a name="use-mysql" />
+
 ##### **How can I use MySQL?**
    * Set the `DB_CONNECTION` environment variable to `mysql`
    * Update the fpm/cli docker containers to `apt-get install php7.0-mysql`
