@@ -1,15 +1,6 @@
 ## Laravel Starter Template [![Build Status](https://travis-ci.org/realpage/laravel-starter.svg?branch=master)](https://travis-ci.org/realpage/laravel-starter)
 
-This [Laravel](https://www.laravel.com) starter template is intended to be used for new projects that utilize Docker for local development and/or production.
-
-## README Contents
-
-* [What's Included](#whats-included)
-* [Requirements](#requirements)
-* [Using This Repository](#using-this-repo)
-* Continuous Integration/Deployment Workflow - [Diagram](http://realpage.github.io/devops-documentation/foundation-deployment-technical-v1.png) - [Video](https://www.youtube.com/watch?v=vHpInByhQfM)
-* [Roadmap](#roadmap)
-* [FAQ](#faq)
+This [Laravel](https://www.laravel.com) starter template is intended to be used for new projects that utilize Docker for local development and/or production.v
 
 <a name="whats-included" />
 
