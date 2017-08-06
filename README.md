@@ -1,20 +1,23 @@
-## Laravel Starter Template [![Build Status](https://travis-ci.org/realpage/laravel-starter.svg?branch=master)](https://travis-ci.org/realpage/laravel-starter)
+## Laravel Docker
 
-This [Laravel](https://www.laravel.com) starter template is intended to be used for new projects that utilize Docker for local development and/or production.v
+This [Laravel](https://www.laravel.com) starter template is intended to be used for new projects that utilize Docker for local development and/or production.
 
 <a name="whats-included" />
 
 ### What's Included
 
- * Latest version of Laravel.
  * Pre-configured `docker-compose.yml` that uses nginx, php-fpm and MySQL.
- * [Travis-CI](https://travis-ci.org) integration
+ * [Travis-CI](https://travis-ci.org) configuration for building docker containers, running tests against them and pushing them to Dockerhub.  
  
 <a name="using-this-repo" />
 
 ### Using This Repository
 
-We recommend [watching this repository](https://help.github.com/articles/watching-repositories/) so you can apply updates made to this project to yours.
+Take the contents of this repository and drop these files into the root of your project.  Then run the following commands:
+
+ * `docker-compose up` - Brings the containers online.  The fist time through this will build your containers
+ * `docker-compose exec web php artisan migrate --seed` - Runs the migrations/seeders from within the docker container
+ * Access your site at http://localhost
 
 #### Dockerhub Setup
 

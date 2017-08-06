@@ -21,11 +21,6 @@ script:
   - docker-compose exec web sh -c "php artisan migrate --seed"
   # Run tests
   - docker-compose exec web sh -c "composer test"
-
-  # Clean up pre-packaged stuff so the Laravel instance is clean and re-run tests to make sure we didn't break something
-  - docker-compose exec fpm sh -c "php artisan clean:template -f"
-  - docker-compose exec fpm sh -c "vendor/bin/phpunit"
-
   # Build cli container
   - docker build -t "bkuhl/laravel-starter:cli" -f infrastructure/cli/Dockerfile .
 after_success:
