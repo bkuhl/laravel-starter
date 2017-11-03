@@ -1,0 +1,23 @@
+version: '2'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: infrastructure/web/ci.Dockerfile
+    image: project:coverage-container
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_LOG_LEVEL=debug
+      - APP_KEY=base64:bZm1kDJvZY00VHnYo8+EIvSGDvjJqFNvnKU9D8SJDXE=
+      - MAIL_DRIVER=log
+    links:
+      - db
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: iamroot
+      MYSQL_DATABASE: database
+      MYSQL_USER: user
+      MYSQL_PASSWORD: secret
