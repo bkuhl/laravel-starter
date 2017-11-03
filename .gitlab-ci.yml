@@ -1,0 +1,90 @@
+# Uses the docker-in-docker approach, allowing us to use docker/docker-compose commands
+# inside of our build process.
+image: docker:edge-git
+services:
+- docker:dind
+
+stages:
+- build
+- test
+- release
+
+# Docker images are categorized within the repository as branch-specific or release-specific
+# categories
+variables:
+  WEB_IMAGE_TAG: $CI_REGISTRY_IMAGE/branches:web-$CI_COMMIT_REF_NAME
+  CLI_IMAGE_TAG: $CI_REGISTRY_IMAGE/branches:cli-$CI_COMMIT_REF_NAME
+  WEB_IMAGE_RELEASE_TAG: $CI_REGISTRY_IMAGE/releases:web-$CI_COMMIT_SHA
+  CLI_IMAGE_RELEASE_TAG: $CI_REGISTRY_IMAGE/releases:cli-$CI_COMMIT_SHA
+
+build-web:
+  stage: build
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - docker build --pull -t $WEB_IMAGE_TAG -f infrastructure/web/Dockerfile .
+    - docker push $WEB_IMAGE_TAG
+
+# Only build the CLI container for master, since we only need it in deployed environments
+build-cli:
+  stage: build
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - docker build --pull -t $CLI_IMAGE_TAG -f infrastructure/cli/Dockerfile .
+    - docker push $CLI_IMAGE_TAG
+  only:
+    - master
+
+# Generate code quality
+codequality:
+  image: docker:latest
+  variables:
+    DOCKER_DRIVER: overlay
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - docker pull codeclimate/codeclimate
+    - docker run --env CODECLIMATE_CODE="$PWD" --volume "$PWD":/code --volume /var/run/docker.sock:/var/run/docker.sock --volume /tmp/cc:/tmp/cc codeclimate/codeclimate init
+    - docker run --env CODECLIMATE_CODE="$PWD" --volume "$PWD":/code --volume /var/run/docker.sock:/var/run/docker.sock --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > codeclimate.json
+  artifacts:
+    paths: [codeclimate.json]
+
+# Only run tests against our web container since it's built on the same components as the CLI container
+test-web:
+  stage: test
+  before_script:
+    # Add the latest docker-compose
+    - apk add --no-cache py2-pip && pip install docker-compose
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    # Use the current build's image as our base for dev builds.  We'll update the tag to something
+    # our docker-compose.ci.yml is expecting to be there
+    - docker pull $WEB_IMAGE_TAG
+    - docker tag $WEB_IMAGE_TAG project:current-branch-build
+    # Using the ci compose configuration by default to keep things simple
+    - rm docker-compose.yml
+    - mv docker-compose.ci.yml docker-compose.yml
+    - docker-compose up -d
+    # Sleeping gives our containers time to initialize
+    - sleep 5
+    # Installing dev dependencies, setting up the database and running tests
+    - docker exec -i $(docker-compose ps -q web) sh -c "composer install --no-interaction --prefer-dist"
+    - docker exec -i $(docker-compose ps -q web) sh -c "php artisan migrate --seed"
+    - docker exec -i $(docker-compose ps -q web) sh -c "vendor/bin/phpunit --coverage-text --colors=never"
+
+push-to-registry:
+  stage: release
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - docker pull $WEB_IMAGE_TAG
+    - docker pull $CLI_IMAGE_TAG
+    - docker tag $WEB_IMAGE_TAG $WEB_IMAGE_RELEASE_TAG
+    - docker tag $CLI_IMAGE_TAG $CLI_IMAGE_RELEASE_TAG
+    - docker push $WEB_IMAGE_RELEASE_TAG
+    - docker push $CLI_IMAGE_RELEASE_TAG
+  only:
+    - master
