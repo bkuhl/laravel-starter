@@ -1,4 +1,4 @@
-FROM bkuhl/fpm-nginx:fpm-7_nginx-1
+FROM bkuhl/fpm-nginx:laravel-fpm_v7.1
 
 WORKDIR /var/www/html
 
