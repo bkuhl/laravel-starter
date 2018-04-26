@@ -12,8 +12,9 @@ services:
       - ./infrastructure/web:/etc/nginx/conf.d
     ports:
       - "80:80"
+  // Locking into version 8.0.3 since 8.0.4 introduced a breaking change to authentication
   db:
-    image: mysql:8.0
+    image: mysql:8.0.3
     ports:
       - "3306:3306"
     environment:
